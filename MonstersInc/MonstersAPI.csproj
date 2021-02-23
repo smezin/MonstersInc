@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\IntimidatorController.cs" />
     <Compile Remove="Migrations\20210223100652_Init2.cs" />
     <Compile Remove="Migrations\20210223100652_Init2.Designer.cs" />
   </ItemGroup>

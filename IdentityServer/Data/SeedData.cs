@@ -17,9 +17,7 @@ namespace IdentityServer
 
         private void SeedIdentityUsersDetails(AppDbContext appDbContext)
         {
-            SeedIdentityRoles(appDbContext);
-            SeedIdentityUsers(appDbContext);
-            SeedIdentityUserRoles(appDbContext);
+            SeedIdentityRoles(appDbContext);            
         }
 
         private void SeedIdentityRoles(AppDbContext appDbContext)
@@ -44,71 +42,6 @@ namespace IdentityServer
                 foreach (var role in roles)
                 {
                     appDbContext.Roles.Add(role);
-                }
-
-                appDbContext.SaveChanges();
-            }
-        }
-
-        private void SeedIdentityUsers(AppDbContext appDbContext)
-        {
-            if (!appDbContext.Users.Any())
-            {
-                List<ApplicationUser> users = new List<ApplicationUser>();
-
-                var adminUser = new ApplicationUser()
-                {
-                    Id = "1",
-                    UserName = "admin",
-                    NormalizedUserName = "admin",
-                    Email = "admin@admin.com",
-                    NormalizedEmail = "admin@admin.com",
-                    EmailConfirmed = true,
-                };
-                adminUser.PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(adminUser, "secret");
-                users.Add(adminUser);
-
-                var userUser = new ApplicationUser()
-                {
-                    Id = "2",
-                    UserName = "user",
-                    NormalizedUserName = "user",
-                    Email = "user@user.com",
-                    NormalizedEmail= "user@user.com",
-                    EmailConfirmed = true
-                };
-                userUser.PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(userUser, "secret");
-                users.Add(userUser);
-
-                foreach (var user in users)
-                {
-                    appDbContext.Users.Add(user);
-                }
-
-                appDbContext.SaveChanges();
-            }
-        }
-
-        private void SeedIdentityUserRoles(AppDbContext appDbContext)
-        {
-            if (!appDbContext.UserRoles.Any())
-            {
-                List<IdentityUserRole<string>> userRoles = new List<IdentityUserRole<string>>();
-                userRoles.Add(new IdentityUserRole<string>()
-                {
-                    UserId = "1",
-                    RoleId = "1"
-                });
-
-                userRoles.Add(new IdentityUserRole<string>()
-                {
-                    UserId = "2",
-                    RoleId = "2"
-                });
-
-                foreach (var userRole in userRoles)
-                {
-                    appDbContext.UserRoles.Add(userRole);
                 }
 
                 appDbContext.SaveChanges();

@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace MonstersAPI.Models
 {
-    public interface IDoorsRepository
+    public interface IDoorsRepository 
     {
         public IQueryable<Door> Doors { get; }
         void SaveDoor(Door d);
         void PatchDoor(Door d);
         void CreateDoor(Door d);
         void DeleteDoor(Door d);
-
+        
     }
 }

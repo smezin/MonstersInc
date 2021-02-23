@@ -39,5 +39,10 @@ namespace MonstersAPI.Models
         {
             _context.SaveChanges();
         }
+
+        public bool Equals(WorkDayRepository other)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

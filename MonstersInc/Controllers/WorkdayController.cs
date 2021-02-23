@@ -28,11 +28,12 @@ namespace MonstersAPI.Controllers
         }
         [HttpGet]
         public IActionResult Get ([FromQuery] bool onlyGoalAccomplished, [FromQuery] DateTime from, [FromQuery] DateTime to)
-        {
+        {            
             log.Info($"get workday request fired by {User.FindFirstValue(ClaimTypes.GivenName)}");
             List<WorkDay> content = _workDayRepository.WorkDays
-                .Where(w => w.Begin > from)
-                .Where(w => w.End < to)
+                .Where(w => w.Begin > from || from == DateTime.MinValue.Date)
+                .Where(w => w.End < to || to == DateTime.MinValue.Date)
+                .Where(w => w.EnergyCollected >= w.EnergyGoal || !onlyGoalAccomplished)
                 .Include(w => w.DepletedDoors)
                 .ToList();
             return Ok(new Response<WorkDay>
@@ -197,7 +198,7 @@ namespace MonstersAPI.Controllers
                     Message = "no open door found"
                 });
             }
-
+           
             Door door = _doorsRepository.Doors
                 .Where(d => d.DoorId == doorId)
                 .FirstOrDefault();
