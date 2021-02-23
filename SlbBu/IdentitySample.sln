@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{0FFC17A4-03D7-407C-858D-A3998FF4D064}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonstersAPI", "OrderService\MonstersAPI.csproj", "{ACA06436-3092-4F43-BA9A-8BF7B1E88C0D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FFC17A4-03D7-407C-858D-A3998FF4D064}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FFC17A4-03D7-407C-858D-A3998FF4D064}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FFC17A4-03D7-407C-858D-A3998FF4D064}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FFC17A4-03D7-407C-858D-A3998FF4D064}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACA06436-3092-4F43-BA9A-8BF7B1E88C0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACA06436-3092-4F43-BA9A-8BF7B1E88C0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACA06436-3092-4F43-BA9A-8BF7B1E88C0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACA06436-3092-4F43-BA9A-8BF7B1E88C0D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E67BA0DC-DD65-4454-A008-57F5487FA9F3}
+	EndGlobalSection
+EndGlobal
