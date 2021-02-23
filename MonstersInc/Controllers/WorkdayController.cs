@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace MonstersAPI.Controllers
@@ -31,6 +30,7 @@ namespace MonstersAPI.Controllers
         {            
             log.Info($"get workday request fired by {User.FindFirstValue(ClaimTypes.GivenName)}");
             List<WorkDay> content = _workDayRepository.WorkDays
+                .Where(w => w.IntimidatorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
                 .Where(w => w.Begin > from || from == DateTime.MinValue.Date)
                 .Where(w => w.End < to || to == DateTime.MinValue.Date)
                 .Where(w => w.EnergyCollected >= w.EnergyGoal || !onlyGoalAccomplished)
@@ -128,100 +128,6 @@ namespace MonstersAPI.Controllers
                     Message = $"exeption {e}"
                 });
             }
-        }      
-        [HttpPatch]
-        [Route("open")]
-        public IActionResult OpenDoor ([FromBody] string doorId)
-        {
-            log.Info($"open door requset fired by {User.FindFirstValue(ClaimTypes.GivenName)}");            
-            WorkDay workDay = GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (workDay == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new Response<WorkDay>
-                {
-                    Status = "error",
-                    Message = "no workday in progress"
-                });
-            }
-
-            Door door = GetIdleDoor(doorId);            
-            if (door == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new Response<WorkDay>
-                {
-                    Status = "error",
-                    Message = "Invalid door id or door unavailable"
-                });
-            }
-
-            door.IsOpen = true;
-            workDay.EnergyCollected += door.Energy;
-            DepletedDoor depletedDoor = new DepletedDoor
-            {
-                DepletedDoorId = System.Guid.NewGuid().ToString(),
-                DoorId = door.DoorId,
-                WorkDayId = workDay.WorkDayId,
-                OpenedAt = DateTime.Now
-            };
-            _doorsRepository.PatchDoor(door);
-            _depletedDoorsRepository.CreateDepletedDoor(depletedDoor);
-            _workDayRepository.PatchWorkDay(workDay);
-
-            List<DepletedDoor> content = new List<DepletedDoor>();
-            content.Add(depletedDoor);
-            return Ok(new Response<DepletedDoor>
-            {
-                Status = "success",
-                Message = "door opened",
-                Content = content
-            });
-        }
-        [HttpPatch]
-        [Route("close")]
-        public IActionResult CloseDoor ([FromBody] string doorId)
-        {
-            WorkDay workDay = GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (workDay == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new Response<WorkDay>
-                {
-                    Status = "error",
-                    Message = "no workday in progress"
-                });
-            }
-            DepletedDoor depletedDoor = GetOpenDoor(doorId);
-            if (depletedDoor == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new Response<DepletedDoor>
-                {
-                    Status = "error",
-                    Message = "no open door found"
-                });
-            }
-           
-            Door door = _doorsRepository.Doors
-                .Where(d => d.DoorId == doorId)
-                .FirstOrDefault();
-            if (door == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new Response<DepletedDoor>
-                {
-                    Status = "error",
-                    Message = "caanot update door LastUsed propery. door not found"
-                });
-            }
-            door.LastUsed = DateTime.Now;
-            depletedDoor.ClosedAt = DateTime.Now;
-            _doorsRepository.PatchDoor(door);
-            _depletedDoorsRepository.PatchDepletedDoor(depletedDoor);
-            List<DepletedDoor> content = new List<DepletedDoor>();
-            content.Add(depletedDoor);
-            return Ok(new Response<DepletedDoor>
-            {
-                Status = "success",
-                Message = "door closed",
-                Content = content
-            });
         }
 
         //helpers
@@ -231,25 +137,6 @@ namespace MonstersAPI.Controllers
                 .Where(w => w.IntimidatorId == intimidatorId)
                 .Where(w => w.End == DateTime.MinValue)
                 .FirstOrDefault();
-        }
-        private Door GetIdleDoor(string doorId)
-        {
-            return _doorsRepository.Doors
-                .Where(d => d.DoorId == doorId)
-                .Where(d => d.IsOpen == false)
-                .Where(d => d.LastUsed.Date != DateTime.Now.Date)
-                .FirstOrDefault();
-        }
-        private DepletedDoor GetOpenDoor(string doorId)
-        {
-            return _depletedDoorsRepository.DepletedDoors
-                .Where(d => d.DoorId == doorId)
-                .Where(d => d.ClosedAt == DateTime.MinValue)
-                .FirstOrDefault();
-        }
-        private void CloseAllDoorsOfWorkDay (string workDayId)
-        {
-
         }
     }
 }
