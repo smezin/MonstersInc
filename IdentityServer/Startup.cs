@@ -28,10 +28,12 @@ namespace IdentityServer
             Action<DbContextOptionsBuilder> identityDbContextBuilder;
 
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-
             string appDbConnectionString = Configuration.GetConnectionString("AppDb");
-
+            
             identityDbContextBuilder = x => x.UseSqlServer(appDbConnectionString, options => options.MigrationsAssembly(migrationsAssembly));
+            services.AddCors();
+            services.AddControllers();
+            //CONTEXTS
             services.AddDbContext<AppDbContext>(config =>
                 {config.UseSqlServer(appDbConnectionString); });
             services.AddDbContext<PersistedGrantDbContext>(config =>
@@ -39,11 +41,8 @@ namespace IdentityServer
             services.AddDbContext<ConfigurationDbContext>(config =>
                 {config.UseSqlServer(appDbConnectionString); });
 
-            services.AddCors();
-            services.AddControllers();           
-          
             services.AddIdentity<ApplicationUser, IdentityRole>(config =>
-            {   //change according to specs
+            {   
                 config.Password.RequiredLength = 8;
                 config.Password.RequireDigit = true;
                 config.Password.RequireNonAlphanumeric = true;
@@ -57,14 +56,14 @@ namespace IdentityServer
                 .AddOperationalStore(options =>
                 {
                     options.EnableTokenCleanup = true;
-                    options.TokenCleanupInterval = 3600;
+                    options.TokenCleanupInterval = 60*60*24;
                 })
 
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = identityDbContextBuilder;
                 })
-                // this adds the operational data from DB (codes, tokens, consents)
+                
                 .AddOperationalStore(options =>
                 {
                     options.ConfigureDbContext = identityDbContextBuilder;

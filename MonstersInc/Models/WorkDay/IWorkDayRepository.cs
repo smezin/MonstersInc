@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 
 namespace MonstersAPI.Models
 {
-    public interface IWorkDayRepository 
+    public interface IWorkDayRepository : IRestfulBaseRepository<WorkDay> 
     {
-        IQueryable<WorkDay> WorkDays { get; }
-        void SaveWorkDay(WorkDay w);
-        void CreateWorkDay(WorkDay w);
-        void DeleteWorkDay(WorkDay w);
-        void PatchWorkDay(WorkDay w);
-        
+        public WorkDay GetActiveWorkDay(string intimidatorId);
+        public void HarvestEnergy(string workDayId, string doorId);
+        public WorkDay StartWorkDay(string intimidatorId);
+        public WorkDay EndWorkDay(string workDayId);
     }
+    
 }

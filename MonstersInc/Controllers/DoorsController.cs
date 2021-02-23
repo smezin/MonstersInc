@@ -30,7 +30,7 @@ namespace MonstersAPI.Controllers
         [HttpGet]
         public IActionResult Get([FromQuery] bool depletedOnly = false, bool openOnly = false, bool availableOnly = false)
         {
-            List<Door> content = _doorsRepository.Doors
+            List<Door> content = _doorsRepository.Get()
                 .Where(d => d.LastUsed.Date == DateTime.Today.Date || !depletedOnly)
                 .Where(d => d.IsOpen == true || !openOnly)
                 .Where(d => (d.IsOpen == false && d.LastUsed.Date != DateTime.Today.Date) || !availableOnly)
@@ -48,7 +48,7 @@ namespace MonstersAPI.Controllers
         public IActionResult OpenDoor([FromBody] string doorId)
         {
             log.Info($"open door requset fired by {User.FindFirstValue(ClaimTypes.GivenName)}");
-            WorkDay workDay = GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            WorkDay workDay = _workDayRepository.GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (workDay == null)
             {
                 return StatusCode(StatusCodes.Status400BadRequest, new Response<WorkDay>
@@ -58,7 +58,7 @@ namespace MonstersAPI.Controllers
                 });
             }
 
-            Door door = GetIdleDoor(doorId);
+            Door door = _doorsRepository.GetDoorIfIdle(doorId);
             if (door == null)
             {
                 return StatusCode(StatusCodes.Status400BadRequest, new Response<WorkDay>
@@ -67,9 +67,8 @@ namespace MonstersAPI.Controllers
                     Message = "Invalid door id or door unavailable"
                 });
             }
-
-            door.IsOpen = true;
-            workDay.EnergyCollected += door.Energy;
+            _doorsRepository.OpenDoor(doorId);
+            _workDayRepository.HarvestEnergy(workDay.WorkDayId, doorId);
             DepletedDoor depletedDoor = new DepletedDoor
             {
                 DepletedDoorId = System.Guid.NewGuid().ToString(),
@@ -77,9 +76,9 @@ namespace MonstersAPI.Controllers
                 WorkDayId = workDay.WorkDayId,
                 OpenedAt = DateTime.Now
             };
-            _doorsRepository.PatchDoor(door);
-            _depletedDoorsRepository.CreateDepletedDoor(depletedDoor);
-            _workDayRepository.PatchWorkDay(workDay);
+            _doorsRepository.Put(door);
+            _depletedDoorsRepository.Post(depletedDoor);
+            _workDayRepository.Put(workDay);
 
             List<DepletedDoor> content = new List<DepletedDoor>();
             content.Add(depletedDoor);
@@ -94,7 +93,7 @@ namespace MonstersAPI.Controllers
         [Route("close")]
         public IActionResult CloseDoor([FromBody] string doorId)
         {
-            WorkDay workDay = GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            WorkDay workDay = _workDayRepository.GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (workDay == null)
             {
                 return StatusCode(StatusCodes.Status400BadRequest, new Response<WorkDay>
@@ -103,7 +102,7 @@ namespace MonstersAPI.Controllers
                     Message = "no workday in progress"
                 });
             }
-            DepletedDoor depletedDoor = GetOpenDoor(doorId);
+            DepletedDoor depletedDoor = _depletedDoorsRepository.GetDepletedDoorIfOpen(doorId);
             if (depletedDoor == null)
             {
                 return StatusCode(StatusCodes.Status400BadRequest, new Response<DepletedDoor>
@@ -113,7 +112,7 @@ namespace MonstersAPI.Controllers
                 });
             }
 
-            Door door = _doorsRepository.Doors
+            Door door = _doorsRepository.Get()
                 .Where(d => d.DoorId == doorId)
                 .FirstOrDefault();
             if (door == null)
@@ -124,11 +123,10 @@ namespace MonstersAPI.Controllers
                     Message = "caanot update door LastUsed propery. door not found"
                 });
             }
-            door.LastUsed = DateTime.Now;
-            door.IsOpen = false;
-            depletedDoor.ClosedAt = DateTime.Now;
-            _doorsRepository.PatchDoor(door);
-            _depletedDoorsRepository.PatchDepletedDoor(depletedDoor);
+            _doorsRepository.CloseDoor(doorId);
+            _depletedDoorsRepository.CloseDepletedDoor(depletedDoor.DepletedDoorId);
+            _doorsRepository.Put(door);
+            _depletedDoorsRepository.Put(depletedDoor);
             List<DepletedDoor> content = new List<DepletedDoor>();
             content.Add(depletedDoor);
             return Ok(new Response<DepletedDoor>
@@ -137,30 +135,6 @@ namespace MonstersAPI.Controllers
                 Message = "door closed",
                 Content = content
             });
-        }
-
-        //helpers
-        private WorkDay GetActiveWorkDay(string intimidatorId)
-        {
-            return _workDayRepository.WorkDays
-                .Where(w => w.IntimidatorId == intimidatorId)
-                .Where(w => w.End == DateTime.MinValue)
-                .FirstOrDefault();
-        }
-        private Door GetIdleDoor(string doorId)
-        {
-            return _doorsRepository.Doors
-                .Where(d => d.DoorId == doorId)
-                .Where(d => d.IsOpen == false)
-                .Where(d => d.LastUsed.Date != DateTime.Now.Date)
-                .FirstOrDefault();
-        }
-        private DepletedDoor GetOpenDoor(string doorId)
-        {
-            return _depletedDoorsRepository.DepletedDoors
-                .Where(d => d.DoorId == doorId)
-                .Where(d => d.ClosedAt == DateTime.MinValue)
-                .FirstOrDefault();
         }
 
     }

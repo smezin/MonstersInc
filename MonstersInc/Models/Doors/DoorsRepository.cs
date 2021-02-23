@@ -1,40 +1,48 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 
 namespace MonstersAPI.Models
 {
-    public class DoorsRepository : IDoorsRepository
+    public class DoorsRepository : RestfulBaseRepository<Door>, IDoorsRepository
     {
-        private MonstersIncDbContext _context;
-        public DoorsRepository (MonstersIncDbContext context)
+        public DoorsRepository(MonstersIncDbContext monstersIncDbContext) : base (monstersIncDbContext) { }        
+        public bool OpenDoor (string doorId)
         {
-            _context = context;
+            Door door = _monstersIncDbContext.Doors
+                .Where(d => d.DoorId == doorId)
+                .FirstOrDefault();
+            if (door == null || door.IsOpen)
+            {
+                return false;
+            }
+            door.IsOpen = true;
+            _monstersIncDbContext.SaveChanges();
+            return true;
         }
-        public IQueryable<Door> Doors => _context.Doors;
-
-        public void CreateDoor(Door d)
+        public bool CloseDoor (string doorId)
         {
-            _context.Doors.Add(d);
-            _context.SaveChanges();
+            Door door = _monstersIncDbContext.Doors
+                .Where(d => d.DoorId == doorId)
+                .FirstOrDefault();
+            if (door == null || !door.IsOpen)
+            {
+                return false;
+            }
+            door.IsOpen = false;
+            door.LastUsed = DateTime.Now;
+            _monstersIncDbContext.SaveChanges();
+            return true;
         }
-
-        public void DeleteDoor(Door d)
+        public Door GetDoorIfIdle(string doorId)
         {
-            _context.Doors.Remove(d);
-            _context.SaveChanges();
+            return _monstersIncDbContext.Doors
+                .Where(d => d.DoorId == doorId)
+                .Where(d => d.IsOpen == false)
+                .Where(d => d.LastUsed.Date != DateTime.Now.Date)
+                .FirstOrDefault();
         }
-
-        public void PatchDoor(Door d)
-        {
-            _context.Attach(d);
-            _context.Entry(d).State = EntityState.Modified;
-            _context.SaveChanges();
-        }
-
-        public void SaveDoor(Door d)
-        {
-            _context.SaveChanges();
-        }
+       
     }
 }

@@ -6,37 +6,28 @@ using System.Threading.Tasks;
 
 namespace MonstersAPI.Models
 {
-    public class DepletedDoorsRepository : IDepletedDoorsRepository
+    public class DepletedDoorsRepository : RestfulBaseRepository<DepletedDoor>, IDepletedDoorsRepository
     {
-        private MonstersIncDbContext _context;
-        public DepletedDoorsRepository(MonstersIncDbContext context)
+        public DepletedDoorsRepository(MonstersIncDbContext monstersIncDbContext) : base (monstersIncDbContext) { }
+        public DepletedDoor GetDepletedDoorIfOpen(string doorId)
         {
-            _context = context;
+            return _monstersIncDbContext.DepletedDoors
+                .Where(d => d.DoorId == doorId)
+                .Where(d => d.ClosedAt == DateTime.MinValue)
+                .FirstOrDefault();
         }
-        public IQueryable<DepletedDoor> DepletedDoors => _context.DepletedDoors;
-
-        public void CreateDepletedDoor(DepletedDoor d)
+        public bool CloseDepletedDoor (string depletedDoorId)
         {
-            _context.Add(d);
-            _context.SaveChanges();
-        }
-
-        public void DeleteDepletedDoor(DepletedDoor d)
-        {
-            _context.Remove(d);
-            _context.SaveChanges();
-        }
-
-        public void PatchDepletedDoor(DepletedDoor d)
-        {
-            _context.Attach(d);
-            _context.Entry(d).State = EntityState.Modified;
-            _context.SaveChanges();
-        }
-
-        public void SaveDepletedDoor(DepletedDoor d)
-        {
-            _context.SaveChanges();
+            DepletedDoor depletedDoor = _monstersIncDbContext.DepletedDoors
+                .Where(d => d.DepletedDoorId == depletedDoorId)
+                .FirstOrDefault();
+            if (depletedDoor != null)
+            {
+                depletedDoor.ClosedAt = DateTime.Now;
+                _monstersIncDbContext.SaveChanges();
+                return true;
+            }
+            return false;
         }
     }
 }

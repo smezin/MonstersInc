@@ -5,12 +5,10 @@ using System.Threading.Tasks;
 
 namespace MonstersAPI.Models
 {
-    public interface IDepletedDoorsRepository
+    public interface IDepletedDoorsRepository : IRestfulBaseRepository<DepletedDoor> 
     {
-        public IQueryable<DepletedDoor> DepletedDoors { get; }
-        void SaveDepletedDoor(DepletedDoor d);
-        void PatchDepletedDoor(DepletedDoor d);
-        void CreateDepletedDoor(DepletedDoor d);
-        void DeleteDepletedDoor(DepletedDoor d);
+        public DepletedDoor GetDepletedDoorIfOpen(string doorId);
+        public bool CloseDepletedDoor(string depletedDoorId);
     }
+   
 }

@@ -1,14 +1,4 @@
-﻿dotnet tool install --global dotnet-ef
-dotnet add package Microsoft.EntityFrameworkCore.Design
-
-dotnet ef migrations add InitialDbMigration -c AppDbContext -o Data/Migrations/AppDb --project IdentityServer
-dotnet ef --startup-project ../IdentityServer migrations add InitialIdentityServerPersistedGrantDbMigration -c PersistedGrantDbContext -o Data/Migrations/IdentityServer/PersistedGrantDb --project IdentityServer
-dotnet ef --startup-project ../IdentityServer migrations add InitialIdentityServerConfigurationDbMigration -c ConfigurationDbContext -o Data/Migrations/IdentityServer/ConfigurationDb --project IdentityServer
-
-dotnet ef database update -c AppDbContext
-dotnet ef database update -c PersistedGrantDbContext
-dotnet ef database update -c ConfigurationDbContext
-
+﻿
 add-migration appDbInit  -context AppDbContext
 add-migration grangDbInit -context PersistedGrantDbContext
 add-migration configDbInit -context ConfigurationDbContext
@@ -16,8 +6,3 @@ add-migration configDbInit -context ConfigurationDbContext
 update-database -context AppDbContext
 update-database -context PersistedGrantDbContext
 update-database -context ConfigurationDbContext
-
-
-When you want to switch between databases then delete the entire Migrations folder from project and just run something similar to the following command, to recreate the initial migration compatible with MySQL or other databases
-
-dotnet ef migrations add CreateIdentitySchema

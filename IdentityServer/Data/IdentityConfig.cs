@@ -50,57 +50,6 @@ namespace IdentityServer
             return clients;
         }
 
-        public List<TestUser> GetTestUsers(List<TestUser> testUsers)
-        {
-            if (testUsers == null || testUsers.Count == 0)
-                testUsers = new List<TestUser>
-                {
-                    new TestUser
-                    {
-                        SubjectId = "1",
-                        Username = "admin",
-                        Password = "admin",
-                        Claims = new List<Claim> {
-                            new Claim(JwtClaimTypes.Email, "admin@admin.com"),
-                            new Claim(JwtClaimTypes.Role, "admin")
-                        }
-                    },
-                    new TestUser
-                    {
-                        SubjectId = "1",
-                        Username = "user",
-                        Password = "user",
-                        Claims = new List<Claim> {
-                            new Claim(JwtClaimTypes.Email, "user@user.com"),
-                            new Claim(JwtClaimTypes.Role, "user")
-                        }
-                    }
-                };
-
-            foreach (var user in testUsers)
-            {
-                if (user.Claims == null || user.Claims.Count == 0)
-                {
-                    if (user.SubjectId == "1")
-                    {
-                        user.Claims = new List<Claim> {
-                            new Claim(JwtClaimTypes.Email, "admin@admin.com"),
-                            new Claim(JwtClaimTypes.Role, "admin")
-                        };
-                    }
-
-                    if (user.SubjectId == "2")
-                    {
-                        user.Claims = new List<Claim> {
-                            new Claim(JwtClaimTypes.Email, "user@user.com"),
-                            new Claim(JwtClaimTypes.Role, "user")
-                        };
-                    }
-                }
-            }
-            return testUsers;
-        }
-
         internal IEnumerable<IdentityResource> GetIdentityResources()
         {
             return new List<IdentityResource>

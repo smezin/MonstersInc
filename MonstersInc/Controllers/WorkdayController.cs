@@ -29,7 +29,7 @@ namespace MonstersAPI.Controllers
         public IActionResult Get ([FromQuery] bool onlyGoalAccomplished, [FromQuery] DateTime from, [FromQuery] DateTime to)
         {            
             log.Info($"get workday request fired by {User.FindFirstValue(ClaimTypes.GivenName)}");
-            List<WorkDay> content = _workDayRepository.WorkDays
+            List<WorkDay> content = _workDayRepository.Get()
                 .Where(w => w.IntimidatorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
                 .Where(w => w.Begin > from || from == DateTime.MinValue.Date)
                 .Where(w => w.End < to || to == DateTime.MinValue.Date)
@@ -49,12 +49,8 @@ namespace MonstersAPI.Controllers
         {
             log.Info($"begin workday requset fired by {User.FindFirstValue(ClaimTypes.GivenName)}");
             try
-            {
-                List<WorkDay> content = new List<WorkDay>();
-                WorkDay activeWorkDay = _workDayRepository.WorkDays
-                    .Where(w => w.IntimidatorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-                    .Where(w => w.End == DateTime.MinValue)
-                    .FirstOrDefault();
+            {                
+                WorkDay activeWorkDay = _workDayRepository.GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));                   
                 if (activeWorkDay != null)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, new Response<WorkDay>
@@ -63,15 +59,11 @@ namespace MonstersAPI.Controllers
                         Message = "workday already in progress"
                     });
                 }
-                WorkDay workDay = new WorkDay
-                {
-                    WorkDayId = System.Guid.NewGuid().ToString(),
-                    Begin = DateTime.Now,
-                    IntimidatorId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    EnergyGoal = 100
-                };
+                WorkDay workDay = _workDayRepository.StartWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                
+                List<WorkDay> content = new List<WorkDay>();
                 content.Add(workDay);
-                _workDayRepository.CreateWorkDay(workDay);
+                _workDayRepository.Post(workDay);
                 return Ok(new Response<WorkDay>
                 {
                     Status = "success",
@@ -97,10 +89,10 @@ namespace MonstersAPI.Controllers
             try
             {
                 List<WorkDay> content = new List<WorkDay>();
-                WorkDay workDay = GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                WorkDay workDay = _workDayRepository.GetActiveWorkDay(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 if (workDay != null)
                 {
-                    workDay.End = DateTime.Now;
+                    _workDayRepository.EndWorkDay(workDay.WorkDayId);
                 }
                 else
                 {
@@ -111,7 +103,7 @@ namespace MonstersAPI.Controllers
                     });
                 }
                 content.Add(workDay);
-                _workDayRepository.PatchWorkDay(workDay);
+                _workDayRepository.Put(workDay);
                 return Ok(new Response<WorkDay>
                 {
                     Status = "success",
@@ -128,15 +120,6 @@ namespace MonstersAPI.Controllers
                     Message = $"exeption {e}"
                 });
             }
-        }
-
-        //helpers
-        private WorkDay GetActiveWorkDay(string intimidatorId)
-        {
-            return _workDayRepository.WorkDays
-                .Where(w => w.IntimidatorId == intimidatorId)
-                .Where(w => w.End == DateTime.MinValue)
-                .FirstOrDefault();
         }
     }
 }
