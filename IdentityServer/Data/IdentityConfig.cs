@@ -33,19 +33,20 @@ namespace IdentityServer
                         ClientId = "web_client_id",
                         AllowedGrantTypes =
                         {
-                            GrantType.ResourceOwnerPassword      
+                            GrantType.ResourceOwnerPassword
                         },
                         ClientSecrets =
                         {
                             new IdentityServer4.Models.Secret("websecret".Sha256())
                         },
-                        AllowedScopes = { 
-                            "monstersapiscope",
-                            IdentityServerConstants.StandardScopes.OpenId                 
-                        }
+                        AllowedScopes = {
+                            "monstersapiscope", "openid",
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Email
+                        },
+                        AccessTokenLifetime = 60*60*24
                     }
                 };
-
             return clients;
         }
 
@@ -97,7 +98,6 @@ namespace IdentityServer
                     }
                 }
             }
-
             return testUsers;
         }
 

@@ -8,6 +8,7 @@ using IdentityServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace IdentityServer.Controllers
 {
@@ -22,11 +23,7 @@ namespace IdentityServer.Controllers
             this.userManager = userManager;
             this.roleManager = roleManager;
         }
-        // GET: IdentityController
-        public ActionResult Index()
-        {
-            return View();
-        }
+
         [HttpPost]
         [Route("register")]
       
@@ -34,6 +31,11 @@ namespace IdentityServer.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (await userManager.FindByEmailAsync(model.Email) != null ||
+                    await userManager.FindByNameAsync(model.UserName) != null) 
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, "username or email already exists");
+                }
                 ApplicationUser user = new ApplicationUser()
                 {
                     UserName = model.UserName,
