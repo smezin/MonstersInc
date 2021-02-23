@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System;
 using IdentityServer4.Validation;
-using Microsoft.OpenApi.Models;
 
 namespace IdentityServer
 {
@@ -119,9 +118,6 @@ namespace IdentityServer
 
                 var appDbContext = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
                 appDbContext.Database.Migrate();
-
-                //SeedData seedData = new SeedData();
-                //seedData.Seed(apiResourceOptions, clientOptions, configurationDbContext, appDbContext);
             }
         }
     }

@@ -34,9 +34,7 @@ namespace IdentityServer
                         ClientId = "web_client_id",
                         AllowedGrantTypes =
                         {
-                            GrantType.ResourceOwnerPassword,
-                        //    GrantType.ClientCredentials,
-                        //    GrantType.Hybrid
+                            GrantType.ResourceOwnerPassword,                     
                         },
                         ClientSecrets =
                         {
