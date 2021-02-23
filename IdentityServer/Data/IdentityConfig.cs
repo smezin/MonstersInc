@@ -20,7 +20,6 @@ namespace IdentityServer
                         UserClaims = new List<string> {"role"}
                     }
                 };
-
             return apiResources;
         }
 
@@ -34,7 +33,7 @@ namespace IdentityServer
                         ClientId = "web_client_id",
                         AllowedGrantTypes =
                         {
-                            GrantType.ResourceOwnerPassword,                     
+                            GrantType.ResourceOwnerPassword      
                         },
                         ClientSecrets =
                         {
@@ -42,9 +41,8 @@ namespace IdentityServer
                         },
                         AllowedScopes = { 
                             "monstersapiscope",
-                    //        IdentityServerConstants.StandardScopes.OpenId,
-                    //        IdentityServerConstants.StandardScopes.Profile
-                        },
+                            IdentityServerConstants.StandardScopes.OpenId                 
+                        }
                     }
                 };
 
@@ -107,9 +105,8 @@ namespace IdentityServer
         {
             return new List<IdentityResource>
             {
-                new IdentityResources.OpenId()
-                //,new IdentityResources.Profile()
-               // ,new IdentityResources.Email()
+                new IdentityResources.OpenId()               
+                ,new IdentityResources.Email()
                 ,new IdentityResource
                 {
                     Name = "role",

@@ -9,6 +9,14 @@ dotnet ef database update -c AppDbContext
 dotnet ef database update -c PersistedGrantDbContext
 dotnet ef database update -c ConfigurationDbContext
 
+add-migration appDbInit  -context AppDbContext
+add-migration grangDbInit -context PersistedGrantDbContext
+add-migration configDbInit -context ConfigurationDbContext
+
+update-database -context AppDbContext
+update-database -context PersistedGrantDbContext
+update-database -context ConfigurationDbContext
+
 
 When you want to switch between databases then delete the entire Migrations folder from project and just run something similar to the following command, to recreate the initial migration compatible with MySQL or other databases
 

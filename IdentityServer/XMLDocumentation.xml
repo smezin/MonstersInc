@@ -4,31 +4,5 @@
         <name>IdentityServer</name>
     </assembly>
     <members>
-        <member name="T:IdentityServer.IdentityConfig">
-            <summary>
-            Identity config class
-            </summary>
-        </member>
-        <member name="M:IdentityServer.IdentityConfig.GetApiResources(System.Collections.Generic.List{IdentityServer4.Models.ApiResource})">
-            <summary>
-            Method to get api resources
-            </summary>
-            <param name="apiResources">Pass ApiResource list</param>
-            <returns>ApiResource list</returns>
-        </member>
-        <member name="M:IdentityServer.IdentityConfig.GetClients(System.Collections.Generic.List{IdentityServer4.Models.Client})">
-            <summary>
-            Method to get clients
-            </summary>
-            <param name="clients">Pass Client list</param>
-            <returns>Client list</returns>
-        </member>
-        <member name="M:IdentityServer.IdentityConfig.GetTestUsers(System.Collections.Generic.List{IdentityServer4.Test.TestUser})">
-            <summary>
-            Method to get test users
-            </summary>
-            <param name="testUsers">Pass TestUser list</param>
-            <returns>TestUser list</returns>
-        </member>
     </members>
 </doc>

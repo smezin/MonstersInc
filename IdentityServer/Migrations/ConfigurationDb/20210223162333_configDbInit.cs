@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace IdentityServer.Migrations.ConfigurationDb
 {
-    public partial class InitConfigDb : Migration
+    public partial class configDbInit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

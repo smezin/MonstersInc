@@ -11,8 +11,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\SeedData.cs" />
+    <Compile Remove="Migrations\**" />
+    <Content Remove="Migrations\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="Migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="ProfileService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Migrations\20210223162310_appDbInit.cs" />
+    <Compile Include="Migrations\20210223162310_appDbInit.Designer.cs" />
+    <Compile Include="Migrations\AppDbContextModelSnapshot.cs" />
+    <Compile Include="Migrations\ConfigurationDb\20210223162333_configDbInit.cs" />
+    <Compile Include="Migrations\ConfigurationDb\20210223162333_configDbInit.Designer.cs" />
+    <Compile Include="Migrations\ConfigurationDb\ConfigurationDbContextModelSnapshot.cs" />
+    <Compile Include="Migrations\PersistedGrantDb\20210223162328_grangDbInit.cs" />
+    <Compile Include="Migrations\PersistedGrantDb\20210223162328_grangDbInit.Designer.cs" />
+    <Compile Include="Migrations\PersistedGrantDb\PersistedGrantDbContextModelSnapshot.cs" />
   </ItemGroup>
 
   <ItemGroup>
